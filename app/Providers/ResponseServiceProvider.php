@@ -15,7 +15,6 @@ class ResponseServiceProvider extends ServiceProvider
             $format = [
                 'data' => [
                     'status' => 201,
-                    'code' => Codes::CREATED_SUCCESS,
                     'title' => $message,
                      $key =>  $data
                 ]
@@ -27,7 +26,6 @@ class ResponseServiceProvider extends ServiceProvider
             $format = [
                 'data' => [
                     'status' => 202,
-                    'code' => Codes::UPDATED_SUCCESS,
                     'title' => $message,
                     $key =>  $data
                 ]
@@ -40,7 +38,6 @@ class ResponseServiceProvider extends ServiceProvider
             $format = [
                 'data' => [
                     'status' => 200,
-                    'code' => Codes::FETCHED_SUCCESS,
                     'title' => $message,
                      $key =>  $data
                 ]
@@ -53,7 +50,6 @@ class ResponseServiceProvider extends ServiceProvider
             $format = [
                 'data' => [
                     'status' => 204,
-                    'code' => Codes::UPDATED_SUCCESS,
                     'title' => $message,
                 ]
             ];

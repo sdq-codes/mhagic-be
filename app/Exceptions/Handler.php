@@ -105,7 +105,6 @@ class Handler extends ExceptionHandler
             # our response message
             $response = [
                 'status' => $status,
-                'code' => Codes::NOT_FOUND,
                 'title' => $message,
                 'source' => array_merge($request->all(), ['path' => $request->getPathInfo()])
             ];
@@ -114,7 +113,6 @@ class Handler extends ExceptionHandler
             $status = 405;
             $response = [
                 'status' => $status,
-                'code' => Codes::HTTP_ERROR,
                 'title' => 'This method is not allowed for this endpoint.',
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -125,7 +123,6 @@ class Handler extends ExceptionHandler
             $status = 400;
             $response = [
                 'status' => $status,
-                'code' => Codes::VALIDATION_FAILED,
                 'title' => 'Some validation errors were encountered while processing your request',
                 'source' => validation_errors_to_messages($e)
             ];
@@ -134,7 +131,6 @@ class Handler extends ExceptionHandler
             $status = 403;
             $response = [
                 'status' => $status,
-                'code' => Codes::HTTP_ERROR,
                 'title' => $e->getMessage(),
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -144,7 +140,6 @@ class Handler extends ExceptionHandler
             $status = 400;
             $response = [
                 'status' => $status,
-                'code' => Codes::INPUT_ERROR,
                 'title' => $e->getMessage(),
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -153,7 +148,6 @@ class Handler extends ExceptionHandler
         } elseif ($e instanceof DeletingFailedException) {
             $response = [
                 'status' => $status,
-                'code' => Codes::EXCEPTION,
                 'title' => $e->getMessage(),
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -163,7 +157,6 @@ class Handler extends ExceptionHandler
             $status = 403;
             $response = [
                 'status' => $status,
-                'code' => Codes::HTTP_ERROR,
                 'title' => $e->getMessage(),
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -173,7 +166,6 @@ class Handler extends ExceptionHandler
             $status = 401;
             $response = [
                 'status' => $status,
-                'code' => Codes::HTTP_ERROR,
                 'title' => $e->getMessage(),
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -183,7 +175,6 @@ class Handler extends ExceptionHandler
             $status = 500;
             $response = [
                 'status' => $status,
-                'code' => Codes::HTTP_ERROR,
                 'title' => $e->getMessage(),
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -195,7 +186,6 @@ class Handler extends ExceptionHandler
             $status = 400;
             $response = [
                 'status' => $status,
-                'code' => Codes::HTTP_ERROR,
                 'title' => $e->getMessage(),
                 'source' => array_merge($request->all(),
                     ['path' => $request->getPathInfo(), 'method' => $request->getMethod()])
@@ -204,7 +194,6 @@ class Handler extends ExceptionHandler
         else {
             $response = [
                 'status' => $status,
-                'code' => Codes::EXCEPTION,
                 'title' => $e->getMessage(),
             ];
         }
