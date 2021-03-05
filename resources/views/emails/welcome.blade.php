@@ -417,8 +417,8 @@
                                         card at the most amazing rates.
                                     </p>
 
-                                    <p>To proceed with the registration , please Copy  the <strong>OTP Code
-                                            </strong>  below and go back to our portal to complete your registration
+                                    <p>To proceed with the password reset , please Copy  the <strong>OTP Code
+                                            </strong>  below and go back to our portal to complete your password reset
                                         .</p>
                                     <!-- Action -->
                                     <table class="body-action" align="center" width="100%" cellpadding="0" cellspacing="0">

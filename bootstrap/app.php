@@ -117,7 +117,7 @@ $app->configure('services');
  $app->register(\Illuminate\Mail\MailServiceProvider::class);
  $app->register(\Illuminate\Notifications\NotificationServiceProvider::class);
  $app->register(\Fedeisas\LaravelMailCssInliner\LaravelMailCssInlinerServiceProvider::class);
-
+$app->make('queue');
 
 
  $app->alias('cache', 'Illuminate\Cache\CacheManager');

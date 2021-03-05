@@ -11,4 +11,8 @@ class Upload extends Model
     public function user(){
         return $this->belongsTo(User::class, 'uploadedBy');
     }
+
+    public function comments(){
+        return $this->hasMany(Comment::class, 'uploadId');
+    }
 }

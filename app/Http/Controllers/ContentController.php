@@ -9,6 +9,7 @@ use App\Models\Fan;
 use App\Models\Payment;
 use App\Models\Upload;
 use App\Models\User;
+use App\Models\UserBlock;
 use App\Models\Vote;
 use App\Models\Wallet;
 use Illuminate\Auth\AuthenticationException;
@@ -29,9 +30,21 @@ class ContentController extends Controller
     }
 
     public function fetchAll() {
+        $user = Auth::user();
+        $uploads = Upload::with('user', 'comments', 'comments.user')
+            ->where('to', '=','Upload')
+            ->get()->shuffle();
+        foreach ($uploads as $key => $upload) {
+            if (UserBlock::where([
+                ['user_id', $user->id],
+                ['contestant_id', $upload->uploadedBy]
+            ])->first()) {
+                unset($uploads[$key]);
+            }
+        }
         return response()->fetch(
             'Content successfully fetched',
-            Upload::with('user')->where('to', '=','Upload')->get()->shuffle(),
+            $uploads,
             'content'
         );
     }
@@ -243,6 +256,19 @@ class ContentController extends Controller
         return response()->fetch(
             'Successfully updated profile',
             User::where('id', $user->id)->first(),
+            'profile'
+        );
+    }
+
+    public function block(string $contestantId) {
+        $user = Auth::user();
+        $block = UserBlock::create([
+            "user_id" => $user->id,
+            "contestant_id" => $contestantId,
+        ]);
+        return response()->fetch(
+            'Successfully updated profile',
+            $block,
             'profile'
         );
     }

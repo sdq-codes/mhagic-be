@@ -22,7 +22,7 @@ Route::group(['prefix' => 'ap1/v1'],function (){
         Route::post('/login','Auth\AuthController@login');
         Route::post('/register','Auth\AuthController@register');
         Route::post('/password/reset','Auth\AuthController@resetPasswordMail');
-        Route::post('/mail/resend','Auth\AuthController@resendVerification');
+        Route::post('/reset','Auth\AuthController@resendVerification');
     });
 
     Route::group(['middleware' => ['auth:api']],function (){
@@ -41,22 +41,7 @@ Route::group(['prefix' => 'ap1/v1'],function (){
     Route::get('/follow/{contestantId}', 'ContentController@follow');
     Route::post('/profile', 'ContentController@profile');
     Route::get('/profile', 'ContentController@fetchProfile');
+    Route::get('/block/{contestantId}', 'ContentController@block');
 
 });
 
-
-
-/*{
-    "lastname" : "Oyebola",
-    "occupation" : "Sodiq",
-    "email" : "oyebola.sd",
-    "gender" : "male",
-    "age" : 23,
-    "username'" : "Lasgidi11",
-    "phone" : "2348125024200",
-    "linkedin" : "",
-    "tiktok" : "",
-    "twitter" : "Hello Baby",
-    "instagram" : "www.ig.dklskd/dsilfsd",
-    "mail" : ""
-}*/

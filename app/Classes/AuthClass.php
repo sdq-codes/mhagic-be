@@ -10,23 +10,26 @@ use App\Events\PasswordReset;
 use App\Exceptions\CustomValidationFailed;
 use App\Exceptions\RecordNotFoundException;
 use App\Http\Resources\UserResource;
+use App\Mail\WelcomeEmail;
 use App\Models\PasswordResetDb;
 use App\Models\User;
 use App\Models\UserActivity;
 use App\Models\Wallet;
 use App\Traits\ActivityManager;
+use App\Traits\ExceptionsHandlers;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\JWT;
 
 class AuthClass
 {
-    use ActivityManager;
+    use ActivityManager, ExceptionsHandlers;
     /**
      * @var User
      */
@@ -67,7 +70,8 @@ class AuthClass
                  'password' => $password,
                  'country' => $data['country'],
                  'username' => $data['username'],
-                 'phone' => $data['phone']
+                 'phone' => $data['phone'],
+                 'email' => $data['email']
              ]);
              $token = auth()->login($user);
              $user->access_token = $token;
@@ -122,23 +126,34 @@ class AuthClass
 
     }
 
-    public function resendVerificationEmail($user){
-        $this->sendVerificationEmail($user);
-        $resource = new UserResource($user);
-        $this->activityLog($user->id,"$user->name Password  Verification Email Resend",'verification');
-        return \response()->fetch('verification mail resent successfully',$user,'user');
+    public function resendVerificationEmail(array $data){
+        $passwordReset = PasswordResetDb::where('token', $data["token"])
+            ->first();
+        $this->checkIfResourceFound($passwordReset, "Wrong OTP entered");
+        $user = User::whereId($passwordReset->userId)->first();
+        if ($user->email == $data['email']) {
+            User::whereId($passwordReset->userId)->update([
+                "password" => Hash::make($data['password'])
+            ]);
+            PasswordResetDb::whereId($passwordReset->id)->delete();
+            return response()->updated('Password reset succesfull', ['sucess'],'user');
+        } else {
+            throw new CustomValidationFailed("Wrong token entered");
+        }
     }
 
-    public function sendResetPasswordMail($telephone){
+    public function sendResetPasswordMail(string $email){
         $otp =  substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil
         (8/strlen($x)) )),1,8);
-        $user = User::where('phone', $telephone)->first();
+        $user = User::where('email', $email)->first();
+        $this->checkIfResourceFound($user, "Email does not belong to a user.");
         if ($user) {
             DB::transaction(function () use ($user, $otp) {
                 PasswordResetDb::create([
                     "token" => $otp,
                     "userId" => $user->id
                 ]);
+                Mail::to($user)->send(new WelcomeEmail($user, $otp));
             });
         }
         return \response()->created('password reset sent successfully', true,'reset');

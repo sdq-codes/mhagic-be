@@ -30,6 +30,7 @@ class AuthController extends Controller
     public function register(Request $request){
         $this->validate($request,[
             'country' => 'required|string',
+            'email' => 'required|string|email',
             'password' => 'required|string|min:6|regex:/^.*(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\D*\d).{10,}.*$/',
             'username' => 'required|string|unique:users|min:6',
             'phone' => 'required|numeric|unique:users'
@@ -47,16 +48,20 @@ class AuthController extends Controller
     }
 
     public function resendVerification(Request $request){
-        $user = $request->user();
-        return $this->authClass->resendVerificationEmail($user);
+        $this->validate($request,[
+            'email' => 'required|string|email',
+            'token' => 'required|string',
+            'password' => 'required|string|min:6|regex:/^.*(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\D*\d).{10,}.*$/',
+        ]);
+        return $this->authClass->resendVerificationEmail($request->all());
     }
 
     public function resetPasswordMail(Request $request){
         $this->validate($request,[
-            'phone' => 'required|numeric'
+            'email' => 'required|email'
         ]);
 
-        return $this->authClass->sendResetPasswordMail($request->phone);
+        return $this->authClass->sendResetPasswordMail($request->email);
     }
 
     public function passwordReset(Request $request){

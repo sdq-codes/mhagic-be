@@ -34,14 +34,16 @@ class WelcomeEmail extends  Mailable implements ShouldQueue
     /* @var $otp **/
 
     public $otp;
+
     /**
      * WelcomeEmail constructor.
      * @param User $user
+     * @param string $otp
      */
-    public function __construct(User $user)
+    public function __construct(User $user, string $otp)
     {
         $this->user = $user;
-        $this->otp = DB::table('email_otp')->where('user_id',$user->id)->first()->otp;
+        $this->otp = $otp;
         $this->baseUrl = site_url('/');
         $this->loginLink = site_url('/login');
         $this->logo = env('APP_LOGO');
