@@ -19,6 +19,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class ContentController extends Controller
 {
@@ -343,6 +344,22 @@ class ContentController extends Controller
             'Successfully reported post',
             $block,
             'report'
+        );
+    }
+
+    public function password(Request $request) {
+        $this->validate($request,[
+            'password' => 'required|string|min:6|regex:/^.*(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\D*\d).{10,}.*$/',
+        ]);
+        $password = Hash::make($request->password);
+        $user = Auth::user();
+        User::where('id', $user->id)->update([
+            "password" => $password
+        ]);
+        return response()->fetch(
+            'Successfully fetch contestant',
+            ['success' => true],
+            'contestant'
         );
     }
     //
