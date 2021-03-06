@@ -53,7 +53,7 @@ class AuthController extends Controller
             'token' => 'required|string',
             'password' => 'required|string|min:6|regex:/^.*(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\D*\d).{10,}.*$/',
         ]);
-        if ()
+//        if ()
         return $this->authClass->resendVerificationEmail($request->all());
     }
 
