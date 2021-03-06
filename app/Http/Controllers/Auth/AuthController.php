@@ -33,7 +33,7 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string|min:6|regex:/^.*(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\D*\d).{10,}.*$/',
             'username' => 'required|string|unique:users|min:6',
-            'phone' => 'required|numeric|unique:users'
+            'phone' => 'numeric|unique:users'
         ]);
 
         return $this->authClass->registerUser($request->all());
