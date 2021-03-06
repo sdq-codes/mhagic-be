@@ -132,7 +132,7 @@ class AuthClass
         $this->checkIfResourceFound($passwordReset, "Wrong OTP entered");
         $user = User::whereId($passwordReset->userId)->first();
         if ($user->email == $data['email']) {
-            User::whereId($passwordReset->userId)->update([
+            User::where('id', $passwordReset->userId)->update([
                 "password" => Hash::make($data['password'])
             ]);
             PasswordResetDb::whereId($passwordReset->id)->delete();
@@ -164,9 +164,6 @@ class AuthClass
         $user->password = $password;
         $user->save();
         $token = auth()->login($user);
-        $user->access_token = $token;
-        $resource = new UserResource($user);
-        $this->activityLog($user->id,"$user->name Password Reset",'reset');
         return response()->updated('Password Reset successfully',$resource,'user');
     }
 
