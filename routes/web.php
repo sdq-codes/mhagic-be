@@ -35,6 +35,7 @@ Route::group(['prefix' => 'ap1/v1'],function (){
     Route::post('/wallet', 'ContentController@fundWallet');
     Route::post('/wallet/transfer', 'ContentController@transferTo');
     Route::get('/wallet', 'ContentController@fetchWallet');
+    Route::get('/notifications', 'ContentController@notifications');
     Route::post('/vote', 'ContentController@vote');
     Route::post('/comment', 'ContentController@comment');
     Route::get('/contestant/{contestantId}', 'ContentController@contestant');
@@ -42,6 +43,7 @@ Route::group(['prefix' => 'ap1/v1'],function (){
     Route::post('/profile', 'ContentController@profile');
     Route::get('/profile', 'ContentController@fetchProfile');
     Route::get('/block/{contestantId}', 'ContentController@block');
+    Route::post('/report', 'ContentController@report');
 
 });
 

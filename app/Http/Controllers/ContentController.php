@@ -6,10 +6,13 @@ use App\Exceptions\CustomValidationFailed;
 use App\Models\Comment;
 use App\Models\Contestant;
 use App\Models\Fan;
+use App\Models\Notification;
 use App\Models\Payment;
+use App\Models\Transaction;
 use App\Models\Upload;
 use App\Models\User;
 use App\Models\UserBlock;
+use App\Models\UserReport;
 use App\Models\Vote;
 use App\Models\Wallet;
 use Illuminate\Auth\AuthenticationException;
@@ -68,6 +71,11 @@ class ContentController extends Controller
             'amount' => $request->amount
         ]);
 
+        Transaction::create([
+            'user_id' => $user->id,
+            'content' => "You have bought $request->amount votes"
+        ]);
+
         return response()->updated(
             'Wallet successfully funded',
             Wallet::where('userId', $user->id)->first(),
@@ -81,6 +89,7 @@ class ContentController extends Controller
 
 //        return $user;
         $wallet = Wallet::where('userId', $user->id)->first();
+        $wallet['transactions'] = Transaction::where('user_id', $user->id)->get();
         if (is_null($wallet)) {
             throw new AuthenticationException("You need to login to fund your wallet");
         }
@@ -94,7 +103,7 @@ class ContentController extends Controller
     public function transferTo(Request $request) {
         $this->validate($request, [
             "amount" => "required",
-            "phone" => "required",
+            "username" => "required",
         ]);
         $user = Auth::user();
         $wallet = Wallet::where('userId', $user->id)->first();
@@ -104,7 +113,7 @@ class ContentController extends Controller
         if ($wallet->newBalance < $request->amount) {
             throw new CustomValidationFailed("You do not have sufficient balance.");
         }
-        $receiveUser = User::where('phone', $request->phone)->first();
+        $receiveUser = User::where('username', $request->username)->first();
         if (is_null($receiveUser)) {
             throw new AuthenticationException("No account is tied to the telephone number you entered.");
         }
@@ -123,6 +132,16 @@ class ContentController extends Controller
         ]);
 
         $wallet = Wallet::where('userId', $user->id)->first();
+
+        Transaction::create([
+            'user_id' => $user->id,
+            'content' => "You have transferred $request->amount votes to $receiveUser->username"
+        ]);
+
+        Transaction::create([
+            'user_id' => $receiveUser->id,
+            'content' => "You have received $request->amount votes from $user->username"
+        ]);
 
         return response()->fetch(
             'Wallet successfully funded',
@@ -156,6 +175,25 @@ class ContentController extends Controller
                 'voted' => $request->voted,
                 'voteCount' => $request->voteCount
             ]);
+
+            $upload = Upload::where("id", $request->voted)->first();
+            $uploadUser = User::where('id', $upload->uploadedBy)->first();
+
+            Notification::create([
+                "userId" => $user->id,
+                "contentImage" => "You made $request->voteCount votes to $uploadUser->username",
+            ]);
+
+            Notification::create([
+                "userId" => $uploadUser->id,
+                "contentImage" => "You video was voted for",
+                "contentUrl" => $upload->id
+            ]);
+
+            /*Transaction::create([
+                'user_id' => $user->id,
+                'content' => "You made $request->voteCount votes for $uploadUser->username"
+            ]);*/
         });
         return response()->fetch(
             'Vote successfully funded',
@@ -176,6 +214,15 @@ class ContentController extends Controller
             "uploadId" => $request->uploadId,
             "content" => $request->commentContent,
             "commentedBy" => $user->id
+        ]);
+
+        $upload = Upload::where("id", $request->uploadId)->first();
+        $uploadUser = User::where('id', $upload->uploadedBy)->first();
+
+        Notification::create([
+            "userId" => $uploadUser->id,
+            "contentImage" => "You video was commented on",
+            "contentUrl" => $upload->id
         ]);
 
         return response()->fetch(
@@ -225,6 +272,14 @@ class ContentController extends Controller
         );
     }
 
+    public function notifications() {
+        return response()->fetch(
+            'Successfully updated profile',
+            Notification::where('userId', Auth::user()->id)->get(),
+            'profile'
+        );
+    }
+
     public function profile(Request $request) {
 
         $this->validate($request,[
@@ -270,6 +325,24 @@ class ContentController extends Controller
             'Successfully updated profile',
             $block,
             'profile'
+        );
+    }
+
+    public function report(Request $request) {
+        $this->validate($request,[
+            "upload" => 'required|string',
+            "report" => 'required|string'
+        ]);
+        $user = Auth::user();
+        $block = UserReport::create([
+            "user_id" => $user->id,
+            "upload_id" => $request->upload,
+            "report" => $request->report,
+        ]);
+        return response()->fetch(
+            'Successfully reported post',
+            $block,
+            'report'
         );
     }
     //
