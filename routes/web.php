@@ -44,7 +44,7 @@ Route::group(['prefix' => 'ap1/v1'],function (){
     Route::get('/profile', 'ContentController@fetchProfile');
     Route::get('/block/{contestantId}', 'ContentController@block');
     Route::post('/report', 'ContentController@report');
-    Route::post('/password', 'ContentController@report');
+    Route::post('/password', 'ContentController@password');
 
 });
 
