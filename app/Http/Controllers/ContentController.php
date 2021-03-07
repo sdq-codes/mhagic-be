@@ -236,7 +236,7 @@ class ContentController extends Controller
     public function contestant($contestantId) {
         return response()->fetch(
             'Successfully fetch contestant',
-            Contestant::with('user', 'uploads', 'fans')->where('id', $contestantId)->get(),
+            Contestant::with('user', 'uploads', 'fans', 'uploads.contestant', 'uploads.contestant.user', 'uploads.comments', 'uploads.comments.user')->where('id', $contestantId)->get(),
             'contestant'
         );
     }
