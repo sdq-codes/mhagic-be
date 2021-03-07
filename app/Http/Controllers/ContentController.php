@@ -35,7 +35,7 @@ class ContentController extends Controller
 
     public function fetchAll() {
         $user = Auth::user();
-        $uploads = Upload::with('user', 'comments', 'comments.user')
+        $uploads = Upload::with('contestant', 'contestant.user', 'comments', 'comments.user')
             ->where('to', '=','Upload')
             ->get()->shuffle();
         foreach ($uploads as $key => $upload) {
